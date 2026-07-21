@@ -5,16 +5,27 @@ import { StatsPanel } from './components/StatsPanel';
 import { fetchNAVHistory, FundMeta, NAVPoint } from './utils/mfApi';
 import { computeRolling, computeStats, RollingPoint } from './utils/rollingReturns';
 
-const WINDOWS = [1, 3, 5, 7, 10];
-const WINDOW_LABELS: Record<number, string> = { 1: '1Y', 3: '3Y', 5: '5Y', 7: '7Y', 10: '10Y' };
+interface Window { years: number; label: string; key: string; defaultActive?: boolean }
+const WINDOWS: Window[] = [
+  { years: 1/12,  label: '1M',  key: 'w1m'  },
+  { years: 3/12,  label: '3M',  key: 'w3m'  },
+  { years: 6/12,  label: '6M',  key: 'w6m'  },
+  { years: 1,     label: '1Y',  key: 'w1y'  },
+  { years: 3,     label: '3Y',  key: 'w3y',  defaultActive: true },
+  { years: 5,     label: '5Y',  key: 'w5y',  defaultActive: true },
+  { years: 7,     label: '7Y',  key: 'w7y'  },
+  { years: 10,    label: '10Y', key: 'w10y' },
+];
 
-interface Series { window: number; points: RollingPoint[] }
+interface Series { key: string; label: string; points: RollingPoint[] }
 
 export default function App() {
   const [meta, setMeta] = useState<FundMeta | null>(null);
   const [nav, setNav] = useState<NAVPoint[]>([]);
   const [series, setSeries] = useState<Series[]>([]);
-  const [activeWindows, setActiveWindows] = useState<number[]>([3, 5]);
+  const [activeKeys, setActiveKeys] = useState<string[]>(
+    WINDOWS.filter(w => w.defaultActive).map(w => w.key)
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -27,7 +38,7 @@ export default function App() {
       const { meta, nav } = await fetchNAVHistory(fund.c);
       setMeta(meta);
       setNav(nav);
-      const computed = WINDOWS.map(w => ({ window: w, points: computeRolling(nav, w) }));
+      const computed = WINDOWS.map(w => ({ key: w.key, label: w.label, points: computeRolling(nav, w.years) }));
       setSeries(computed);
     } catch {
       setError('Failed to fetch NAV history. Try again.');
@@ -36,14 +47,17 @@ export default function App() {
     }
   }, []);
 
-  function toggleWindow(w: number) {
-    setActiveWindows(prev =>
-      prev.includes(w) ? (prev.length > 1 ? prev.filter(x => x !== w) : prev) : [...prev, w].sort((a, b) => a - b)
+  function toggleWindow(key: string) {
+    setActiveKeys(prev =>
+      prev.includes(key) ? (prev.length > 1 ? prev.filter(k => k !== key) : prev) : [...prev, key]
     );
   }
 
-  const activeStats = activeWindows.length === 1
-    ? computeStats(series.find(s => s.window === activeWindows[0])?.points ?? [])
+  const activeStats = activeKeys.length === 1
+    ? computeStats(series.find(s => s.key === activeKeys[0])?.points ?? [])
+    : null;
+  const activeWindow = activeKeys.length === 1
+    ? WINDOWS.find(w => w.key === activeKeys[0])
     : null;
 
   const navSpan = nav.length >= 2
@@ -114,23 +128,23 @@ export default function App() {
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs text-gray-500 mr-1">Rolling window:</span>
               {WINDOWS.map(w => {
-                const pts = series.find(s => s.window === w)?.points ?? [];
+                const pts = series.find(s => s.key === w.key)?.points ?? [];
                 const disabled = pts.length < 10;
                 return (
                   <button
-                    key={w}
-                    onClick={() => !disabled && toggleWindow(w)}
+                    key={w.key}
+                    onClick={() => !disabled && toggleWindow(w.key)}
                     disabled={disabled}
                     title={disabled ? 'Not enough data for this window' : ''}
                     className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border
                       ${disabled
                         ? 'opacity-30 cursor-not-allowed border-gray-700 text-gray-600'
-                        : activeWindows.includes(w)
+                        : activeKeys.includes(w.key)
                           ? 'bg-blue-600 border-blue-500 text-white'
                           : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'
                       }`}
                   >
-                    {WINDOW_LABELS[w]}
+                    {w.label}
                     {!disabled && (
                       <span className="ml-1.5 text-xs opacity-60">({pts.length})</span>
                     )}
@@ -144,22 +158,22 @@ export default function App() {
               <p className="text-xs text-gray-500 mb-4">
                 Each point = CAGR of ₹1 lakh invested on that date for the selected window period
               </p>
-              <RollingChart series={series} activeWindows={activeWindows} />
+              <RollingChart series={series} activeKeys={activeKeys} />
             </div>
 
             {/* Stats — shown when exactly one window selected */}
-            {activeWindows.length === 1 && activeStats && (
+            {activeKeys.length === 1 && activeStats && activeWindow && (
               <div>
                 <p className="text-xs text-gray-500 mb-3">
-                  Statistics for <span className="text-white font-medium">{WINDOW_LABELS[activeWindows[0]]}</span> rolling returns
+                  Statistics for <span className="text-white font-medium">{activeWindow.label}</span> rolling returns
                   across <span className="text-white font-medium">{activeStats.count.toLocaleString()}</span> periods
                 </p>
-                <StatsPanel windowYears={activeWindows[0]} stats={activeStats} />
+                <StatsPanel windowLabel={activeWindow.label} stats={activeStats} />
               </div>
             )}
 
             {/* Multi-window hint */}
-            {activeWindows.length > 1 && (
+            {activeKeys.length > 1 && (
               <p className="text-xs text-gray-500 text-center">
                 Select a single window to see detailed statistics
               </p>

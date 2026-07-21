@@ -4,38 +4,41 @@ import {
 } from 'recharts';
 import { RollingPoint } from '../utils/rollingReturns';
 
-const WINDOW_COLORS: Record<number, string> = {
-  1:  '#60a5fa',
-  3:  '#34d399',
-  5:  '#f59e0b',
-  7:  '#a78bfa',
-  10: '#f87171',
+const KEY_COLORS: Record<string, string> = {
+  w1m:  '#e879f9',
+  w3m:  '#fb923c',
+  w6m:  '#facc15',
+  w1y:  '#60a5fa',
+  w3y:  '#34d399',
+  w5y:  '#f59e0b',
+  w7y:  '#a78bfa',
+  w10y: '#f87171',
+};
+
+const KEY_LABELS: Record<string, string> = {
+  w1m: '1M', w3m: '3M', w6m: '6M',
+  w1y: '1Y', w3y: '3Y', w5y: '5Y', w7y: '7Y', w10y: '10Y',
 };
 
 interface RollingChartProps {
-  series: { window: number; points: RollingPoint[] }[];
-  activeWindows: number[];
+  series: { key: string; label: string; points: RollingPoint[] }[];
+  activeKeys: string[];
 }
 
-interface ChartRow {
-  ts: number;
-  label: string;
-  [key: string]: number | string;
-}
+interface ChartRow { ts: number; [k: string]: number }
 
 function fmtDate(ts: number) {
   return new Date(ts).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
 }
 
-export function RollingChart({ series, activeWindows }: RollingChartProps) {
-  // Merge all series into one array keyed by timestamp
+export function RollingChart({ series, activeKeys }: RollingChartProps) {
   const byTs = new Map<number, ChartRow>();
-  for (const { window, points } of series) {
-    if (!activeWindows.includes(window)) continue;
+  for (const { key, points } of series) {
+    if (!activeKeys.includes(key)) continue;
     for (const p of points) {
       const ts = p.date.getTime();
-      if (!byTs.has(ts)) byTs.set(ts, { ts, label: fmtDate(ts) });
-      (byTs.get(ts)!)[`w${window}`] = +p.return.toFixed(2);
+      if (!byTs.has(ts)) byTs.set(ts, { ts });
+      byTs.get(ts)![key] = +p.return.toFixed(2);
     }
   }
 
@@ -47,46 +50,39 @@ export function RollingChart({ series, activeWindows }: RollingChartProps) {
         <LineChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
           <XAxis
-            dataKey="ts"
-            type="number"
+            dataKey="ts" type="number"
             domain={['dataMin', 'dataMax']}
             tickFormatter={fmtDate}
             tick={{ fill: '#6b7280', fontSize: 11 }}
-            tickLine={false}
-            scale="time"
+            tickLine={false} scale="time"
           />
           <YAxis
             tickFormatter={v => `${v > 0 ? '+' : ''}${v}%`}
             tick={{ fill: '#6b7280', fontSize: 11 }}
-            tickLine={false}
-            axisLine={false}
-            width={56}
+            tickLine={false} axisLine={false} width={56}
           />
           <Tooltip
             contentStyle={{ background: '#111827', border: '1px solid #374151', borderRadius: 8 }}
             labelStyle={{ color: '#9ca3af', fontSize: 12 }}
-            formatter={(value: number, name: string) => {
-              const w = name.replace('w', '');
-              return [`${value > 0 ? '+' : ''}${value}%`, `${w}Y Rolling CAGR`];
-            }}
+            formatter={(value: number, name: string) => [
+              `${value > 0 ? '+' : ''}${value}%`,
+              `${KEY_LABELS[name] ?? name} Rolling`,
+            ]}
             labelFormatter={ts => fmtDate(Number(ts))}
           />
           <ReferenceLine y={0} stroke="#374151" strokeDasharray="4 4" />
           <Legend
-            formatter={(val) => {
-              const w = String(val).replace('w', '');
-              return <span style={{ color: WINDOW_COLORS[+w], fontSize: 12 }}>{w}Y Rolling</span>;
-            }}
+            formatter={val => (
+              <span style={{ color: KEY_COLORS[String(val)], fontSize: 12 }}>
+                {KEY_LABELS[String(val)] ?? val} Rolling
+              </span>
+            )}
           />
-          {activeWindows.map(w => (
+          {activeKeys.map(k => (
             <Line
-              key={w}
-              type="monotone"
-              dataKey={`w${w}`}
-              stroke={WINDOW_COLORS[w]}
-              dot={false}
-              strokeWidth={1.5}
-              connectNulls={false}
+              key={k} type="monotone" dataKey={k}
+              stroke={KEY_COLORS[k] ?? '#888'}
+              dot={false} strokeWidth={1.5} connectNulls={false}
             />
           ))}
         </LineChart>

@@ -1,7 +1,7 @@
 import { RollingStats } from '../utils/rollingReturns';
 
 interface StatsPanelProps {
-  windowYears: number;
+  windowLabel: string;
   stats: RollingStats;
 }
 
@@ -13,7 +13,7 @@ function color(n: number) {
   return n >= 0 ? 'text-green-400' : 'text-red-400';
 }
 
-export function StatsPanel({ windowYears, stats }: StatsPanelProps) {
+export function StatsPanel({ windowLabel, stats }: StatsPanelProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
       {[
@@ -28,7 +28,7 @@ export function StatsPanel({ windowYears, stats }: StatsPanelProps) {
           <div className={`text-xl font-bold tabular-nums ${special ? (value >= 90 ? 'text-green-400' : value >= 70 ? 'text-yellow-400' : 'text-red-400') : colored ? color(value) : 'text-white'}`}>
             {special ? value.toFixed(1) + '%' : fmt(value)}
           </div>
-          {!special && <div className="text-xs text-gray-600 mt-0.5">{windowYears}Y CAGR</div>}
+          {!special && <div className="text-xs text-gray-600 mt-0.5">{windowLabel} return</div>}
         </div>
       ))}
     </div>
