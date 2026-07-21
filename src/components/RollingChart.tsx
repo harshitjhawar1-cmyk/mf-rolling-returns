@@ -55,7 +55,7 @@ function fmtDate(ts: number) {
   return new Date(ts).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
 }
 
-interface Meta { endTs: number; startNav: number; endNav: number }
+interface Meta { endTs: number; startNav: number; endNav: number; isAnnualised: boolean }
 const metaMap = new Map<string, Meta>();
 
 export function RollingChart({ series, activeKeys }: RollingChartProps) {
@@ -68,10 +68,10 @@ export function RollingChart({ series, activeKeys }: RollingChartProps) {
     if (!activeKeys.includes(key)) continue;
     const sampled = sample(points, days);
     for (const p of sampled) {
-      const ts = p.endDate.getTime(); // X-axis = end of window (exit date)
+      const ts = p.endDate.getTime();
       if (!byTs.has(ts)) byTs.set(ts, { ts });
       byTs.get(ts)![key] = +p.return.toFixed(2);
-      metaMap.set(`${ts}_${key}`, { endTs: p.date.getTime(), startNav: p.startNav, endNav: p.endNav });
+      metaMap.set(`${ts}_${key}`, { endTs: p.date.getTime(), startNav: p.startNav, endNav: p.endNav, isAnnualised: p.isAnnualised });
     }
   }
 
@@ -125,6 +125,9 @@ export function RollingChart({ series, activeKeys }: RollingChartProps) {
                   <span key="v" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <span style={{ fontWeight: 600, fontSize: 13 }}>{value > 0 ? '+' : ''}{value}%</span>
                     {meta && <>
+                      <span style={{ color: '#818cf8', fontSize: 10, fontStyle: 'italic' }}>
+                        {meta.isAnnualised ? 'annualised CAGR' : 'absolute return (not annualised)'}
+                      </span>
                       <span style={{ color: '#9ca3af', fontSize: 11 }}>
                         {fmtDate(meta.endTs)} → {fmtDate(Number(ts))}
                       </span>
