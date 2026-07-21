@@ -63,7 +63,8 @@ export function SearchBox({ onSelect }: SearchBoxProps) {
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder={loading ? 'Loading fund index…' : 'Search fund name or scheme code…'}
           disabled={loading}
-          className="w-full pl-12 pr-4 py-4 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-base transition-colors disabled:opacity-50"
+          className="w-full pl-12 pr-4 py-4 rounded-xl text-base transition-all disabled:opacity-50"
+          style={{ background: 'transparent', border: 'none', outline: 'none', color: '#e2e8f5', fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 15 }}
         />
         {loading && (
           <div className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -71,15 +72,17 @@ export function SearchBox({ onSelect }: SearchBoxProps) {
       </div>
 
       {open && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 8, background: '#111827', border: '1px solid rgba(255,255,255,.12)', borderRadius: 14, boxShadow: '0 20px 60px rgba(0,0,0,.6)', zIndex: 50, overflow: 'hidden' }}>
           {results.map(f => (
             <button
               key={f.c}
               onClick={() => handleSelect(f)}
-              className="w-full text-left px-4 py-3 hover:bg-gray-800 transition-colors border-b border-gray-800 last:border-0"
+              style={{ width: '100%', textAlign: 'left', padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,.05)', background: 'transparent', cursor: 'pointer', transition: 'background .1s' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(99,102,241,.1)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             >
-              <div className="text-sm text-white font-medium leading-snug">{f.n}</div>
-              <div className="text-xs text-gray-500 mt-0.5 font-mono">#{f.c}</div>
+              <div style={{ fontSize: 13, color: '#e2e8f5', fontWeight: 500, lineHeight: 1.4, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{f.n}</div>
+              <div style={{ fontSize: 11, color: '#475569', marginTop: 2, fontFamily: 'Fira Code, monospace' }}>#{f.c}</div>
             </button>
           ))}
         </div>
