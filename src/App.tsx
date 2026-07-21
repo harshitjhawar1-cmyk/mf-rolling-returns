@@ -314,9 +314,11 @@ export default function App() {
                         const col = (n: number) => n >= 0 ? '#34d399' : '#f87171';
                         return (
                           <tr key={fd.fund.c} style={{ borderBottom:'1px solid var(--border)' }}>
-                            <td style={{ padding:'10px 12px', display:'flex', alignItems:'center', gap:8 }}>
-                              <span style={{ width:10, height:10, borderRadius:'50%', background:fd.color, flexShrink:0 }} />
-                              <span style={{ color:'var(--txt)', fontWeight:500, fontSize:13, maxWidth:280, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{shortName}</span>
+                            <td style={{ padding:'10px 12px', textAlign:'left' }}>
+                              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                                <span style={{ width:10, height:10, borderRadius:'50%', background:fd.color, flexShrink:0 }} />
+                                <span style={{ color:'var(--txt)', fontWeight:500, fontSize:13, maxWidth:280, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{shortName}</span>
+                              </div>
                             </td>
                             {st ? (
                               <>
