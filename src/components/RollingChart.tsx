@@ -31,7 +31,11 @@ function fmtDate(ts: number) {
   return new Date(ts).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
 }
 
+// Store end-dates per (ts, key) for tooltip
+const endDateMap = new Map<string, number>();
+
 export function RollingChart({ series, activeKeys }: RollingChartProps) {
+  endDateMap.clear();
   const byTs = new Map<number, ChartRow>();
   for (const { key, points } of series) {
     if (!activeKeys.includes(key)) continue;
@@ -39,6 +43,7 @@ export function RollingChart({ series, activeKeys }: RollingChartProps) {
       const ts = p.date.getTime();
       if (!byTs.has(ts)) byTs.set(ts, { ts });
       byTs.get(ts)![key] = +p.return.toFixed(2);
+      endDateMap.set(`${ts}_${key}`, p.endDate.getTime());
     }
   }
 
@@ -64,10 +69,20 @@ export function RollingChart({ series, activeKeys }: RollingChartProps) {
           <Tooltip
             contentStyle={{ background: '#111827', border: '1px solid #374151', borderRadius: 8 }}
             labelStyle={{ color: '#9ca3af', fontSize: 12 }}
-            formatter={(value: number, name: string) => [
-              `${value > 0 ? '+' : ''}${value}%`,
-              `${KEY_LABELS[name] ?? name} Rolling`,
-            ]}
+            formatter={(value: number, name: string, props: { payload?: ChartRow }) => {
+              const ts = props?.payload?.ts;
+              const endTs = ts != null ? endDateMap.get(`${ts}_${name}`) : undefined;
+              const range = endTs != null
+                ? `${fmtDate(Number(ts))} → ${fmtDate(endTs)}`
+                : fmtDate(Number(ts));
+              return [
+                <span key="v">
+                  <span style={{ fontWeight: 600 }}>{value > 0 ? '+' : ''}{value}%</span>
+                  <span style={{ color: '#6b7280', fontSize: 11, marginLeft: 6 }}>{range}</span>
+                </span>,
+                `${KEY_LABELS[name] ?? name} Rolling`,
+              ];
+            }}
             labelFormatter={ts => fmtDate(Number(ts))}
           />
           <ReferenceLine y={0} stroke="#374151" strokeDasharray="4 4" />
