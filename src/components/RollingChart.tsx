@@ -5,6 +5,7 @@ import {
 } from 'recharts';
 import { RollingPoint } from '../utils/rollingReturns';
 import { FundData } from '../App';
+import { track } from '../utils/analytics';
 
 const WINDOW_COLORS: Record<string, string> = {
   w1m:'#e879f9', w3m:'#fb923c', w6m:'#facc15',
@@ -102,7 +103,7 @@ export function RollingChart({ funds, activeKeys, isCompare }: RollingChartProps
       <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
         <span style={{ fontSize:11, color:'var(--txt3)', fontFamily:'Fira Code' }}>Granularity:</span>
         {GRANULARITIES.map(g => (
-          <button key={g.value} onClick={() => setGranularity(g.value)}
+          <button key={g.value} onClick={() => { setGranularity(g.value); track('granularity_changed', { granularity: g.value }); }}
             style={{
               padding:'4px 12px', borderRadius:999, fontSize:12, fontWeight:500,
               border:`1px solid ${granularity === g.value ? 'rgba(255,255,255,.2)' : 'rgba(255,255,255,.07)'}`,

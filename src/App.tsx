@@ -5,6 +5,7 @@ import { StatsPanel } from './components/StatsPanel';
 import { RollingTable } from './components/RollingTable';
 import { fetchNAVHistory, FundMeta, NAVPoint } from './utils/mfApi';
 import { computeRolling, computeStats, RollingPoint } from './utils/rollingReturns';
+import { track, trackPageView } from './utils/analytics';
 
 interface WindowDef { years: number; label: string; key: string; defaultActive?: boolean }
 const WINDOWS: WindowDef[] = [
@@ -49,6 +50,20 @@ export default function App() {
     if (funds.some(f => f.fund.c === entry.c)) return;
     if (funds.length >= MAX_FUNDS) return;
 
+    const position = funds.length + 1;
+    track('fund_added', {
+      scheme_code: entry.c,
+      scheme_name: entry.n,
+      fund_position: position,
+      is_comparison: position > 1,
+    });
+    if (position === 2) {
+      track('compare_mode_entered', { fund_count: 2 });
+      trackPageView('/compare', 'MF Rolling Returns — Compare');
+    } else if (position === 1) {
+      trackPageView('/fund', 'MF Rolling Returns — Fund Detail');
+    }
+
     const color = FUND_COLORS[funds.length % FUND_COLORS.length];
     const placeholder: FundData = { fund: entry, meta: null, nav: [], series: [], color, loading: true, error: '' };
     setFunds(prev => [...prev, placeholder]);
@@ -59,17 +74,37 @@ export default function App() {
       const { meta, nav } = await fetchNAVHistory(entry.c);
       const series = WINDOWS.map(w => ({ key: w.key, label: w.label, points: computeRolling(nav, w.years) }));
       setFunds(prev => prev.map(f => f.fund.c === entry.c ? { ...f, meta, nav, series, loading: false } : f));
+      track('fund_loaded', {
+        scheme_code: entry.c,
+        scheme_name: entry.n,
+        fund_house: meta.fundHouse,
+        category: meta.schemeCategory,
+        nav_points: nav.length,
+      });
     } catch {
       setFunds(prev => prev.map(f => f.fund.c === entry.c ? { ...f, loading: false, error: 'Failed to fetch NAV data.' } : f));
+      track('fund_load_failed', { scheme_code: entry.c, scheme_name: entry.n });
     }
   }, [funds]);
 
   function removeFund(code: number) {
+    const removed = funds.find(f => f.fund.c === code);
+    track('fund_removed', {
+      scheme_code: code,
+      scheme_name: removed?.fund.n,
+      remaining: funds.length - 1,
+    });
     setFunds(prev => prev.filter(f => f.fund.c !== code));
   }
 
   function toggleWindow(key: string) {
-    if (isCompare) { setCompareWindow(key); return; }
+    const label = WINDOWS.find(w => w.key === key)?.label ?? key;
+    if (isCompare) {
+      track('compare_window_changed', { window: label });
+      setCompareWindow(key);
+      return;
+    }
+    track('window_toggled', { window: label });
     setActiveKeys(prev => prev.includes(key) ? (prev.length > 1 ? prev.filter(k => k !== key) : prev) : [...prev, key]);
   }
 
@@ -256,7 +291,7 @@ export default function App() {
                   style={{ marginLeft:'auto', display:'inline-flex', alignItems:'center', gap:6, padding:'6px 14px', borderRadius:8, border:'1px dashed rgba(99,102,241,.4)', background:'rgba(99,102,241,.08)', color:'var(--indigo-lt)', fontSize:12, fontWeight:500, cursor:'pointer', transition:'all .15s' }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor='var(--indigo)'; e.currentTarget.style.background='rgba(99,102,241,.15)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor='rgba(99,102,241,.4)'; e.currentTarget.style.background='rgba(99,102,241,.08)'; }}
-                  onClick={() => globalThis.scrollTo({ top: 0, behavior: 'smooth' })}
+                  onClick={() => { track('add_fund_cta_clicked', { current_funds: funds.length }); globalThis.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 >
                   <span style={{ fontSize:16 }}>+</span> Add fund to compare
                 </button>
