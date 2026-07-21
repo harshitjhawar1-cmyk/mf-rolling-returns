@@ -68,10 +68,10 @@ export function RollingChart({ series, activeKeys }: RollingChartProps) {
     if (!activeKeys.includes(key)) continue;
     const sampled = sample(points, days);
     for (const p of sampled) {
-      const ts = p.date.getTime();
+      const ts = p.endDate.getTime(); // X-axis = end of window (exit date)
       if (!byTs.has(ts)) byTs.set(ts, { ts });
       byTs.get(ts)![key] = +p.return.toFixed(2);
-      metaMap.set(`${ts}_${key}`, { endTs: p.endDate.getTime(), startNav: p.startNav, endNav: p.endNav });
+      metaMap.set(`${ts}_${key}`, { endTs: p.date.getTime(), startNav: p.startNav, endNav: p.endNav });
     }
   }
 
@@ -126,7 +126,7 @@ export function RollingChart({ series, activeKeys }: RollingChartProps) {
                     <span style={{ fontWeight: 600, fontSize: 13 }}>{value > 0 ? '+' : ''}{value}%</span>
                     {meta && <>
                       <span style={{ color: '#9ca3af', fontSize: 11 }}>
-                        {fmtDate(Number(ts))} → {fmtDate(meta.endTs)}
+                        {fmtDate(meta.endTs)} → {fmtDate(Number(ts))}
                       </span>
                       <span style={{ color: '#6b7280', fontSize: 11 }}>
                         NAV {meta.startNav.toFixed(4)} → {meta.endNav.toFixed(4)}
@@ -136,7 +136,7 @@ export function RollingChart({ series, activeKeys }: RollingChartProps) {
                   `${KEY_LABELS[name] ?? name} Rolling`,
                 ];
               }}
-              labelFormatter={ts => fmtDate(Number(ts))}
+              labelFormatter={ts => `Exit: ${fmtDate(Number(ts))}`}
             />
             <ReferenceLine y={0} stroke="#374151" strokeDasharray="4 4" />
             <Legend

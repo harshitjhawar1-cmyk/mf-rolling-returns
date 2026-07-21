@@ -314,7 +314,7 @@ export default function App() {
             {/* Chart */}
             <div style={{ padding: '24px 32px 20px' }}>
               <p className="mono" style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 16 }}>
-                Each point = annualised CAGR of ₹1 lakh invested on that date for the selected window period
+                X-axis = exit date · each point = annualised CAGR of ₹1 lakh held for the selected window ending on that date
               </p>
               <RollingChart series={series} activeKeys={activeKeys} />
             </div>
