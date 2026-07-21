@@ -31,11 +31,11 @@ function fmtDate(ts: number) {
   return new Date(ts).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
 }
 
-// Store end-dates per (ts, key) for tooltip
-const endDateMap = new Map<string, number>();
+interface Meta { endTs: number; startNav: number; endNav: number }
+const metaMap = new Map<string, Meta>();
 
 export function RollingChart({ series, activeKeys }: RollingChartProps) {
-  endDateMap.clear();
+  metaMap.clear();
   const byTs = new Map<number, ChartRow>();
   for (const { key, points } of series) {
     if (!activeKeys.includes(key)) continue;
@@ -43,7 +43,7 @@ export function RollingChart({ series, activeKeys }: RollingChartProps) {
       const ts = p.date.getTime();
       if (!byTs.has(ts)) byTs.set(ts, { ts });
       byTs.get(ts)![key] = +p.return.toFixed(2);
-      endDateMap.set(`${ts}_${key}`, p.endDate.getTime());
+      metaMap.set(`${ts}_${key}`, { endTs: p.endDate.getTime(), startNav: p.startNav, endNav: p.endNav });
     }
   }
 
@@ -71,14 +71,18 @@ export function RollingChart({ series, activeKeys }: RollingChartProps) {
             labelStyle={{ color: '#9ca3af', fontSize: 12 }}
             formatter={(value: number, name: string, props: { payload?: ChartRow }) => {
               const ts = props?.payload?.ts;
-              const endTs = ts != null ? endDateMap.get(`${ts}_${name}`) : undefined;
-              const range = endTs != null
-                ? `${fmtDate(Number(ts))} → ${fmtDate(endTs)}`
-                : fmtDate(Number(ts));
+              const meta = ts != null ? metaMap.get(`${ts}_${name}`) : undefined;
               return [
-                <span key="v">
-                  <span style={{ fontWeight: 600 }}>{value > 0 ? '+' : ''}{value}%</span>
-                  <span style={{ color: '#6b7280', fontSize: 11, marginLeft: 6 }}>{range}</span>
+                <span key="v" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <span style={{ fontWeight: 600, fontSize: 13 }}>{value > 0 ? '+' : ''}{value}%</span>
+                  {meta && <>
+                    <span style={{ color: '#9ca3af', fontSize: 11 }}>
+                      {fmtDate(Number(ts))} → {fmtDate(meta.endTs)}
+                    </span>
+                    <span style={{ color: '#6b7280', fontSize: 11 }}>
+                      NAV {meta.startNav.toFixed(4)} → {meta.endNav.toFixed(4)}
+                    </span>
+                  </>}
                 </span>,
                 `${KEY_LABELS[name] ?? name} Rolling`,
               ];

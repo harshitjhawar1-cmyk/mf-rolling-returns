@@ -1,9 +1,11 @@
 import { NAVPoint } from './mfApi';
 
 export interface RollingPoint {
-  date: Date;    // start of the window
-  endDate: Date; // end of the window
-  return: number; // annualised CAGR in %
+  date: Date;
+  endDate: Date;
+  startNav: number;
+  endNav: number;
+  return: number;
 }
 
 export interface RollingStats {
@@ -46,7 +48,7 @@ export function computeRolling(nav: NAVPoint[], windowYears: number): RollingPoi
     if (Math.abs(actualYears - windowYears) / windowYears > 0.1) continue;
 
     const r = cagr(nav[i].nav, nav[best].nav, actualYears);
-    if (!isNaN(r)) results.push({ date: nav[i].date, endDate: nav[best].date, return: r });
+    if (!isNaN(r)) results.push({ date: nav[i].date, endDate: nav[best].date, startNav: nav[i].nav, endNav: nav[best].nav, return: r });
   }
 
   return results;
