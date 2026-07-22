@@ -26,11 +26,14 @@ export function initGA() {
   document.head.appendChild(s);
 
   window.dataLayer = window.dataLayer || [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  window.gtag = function gtag(...args: any[]) { window.dataLayer.push(args); };
+  // Canonical gtag: MUST push the `arguments` object, not a spread array —
+  // gtag.js reads dataLayer entries expecting arguments-shaped items.
+  // eslint-disable-next-line prefer-rest-params, @typescript-eslint/no-explicit-any
+  window.gtag = function gtag() { window.dataLayer.push(arguments); } as any;
+
   window.gtag('js', new Date());
-  // We send page views manually so we can label SPA states
-  window.gtag('config', GA_ID, { send_page_view: false });
+  // send_page_view:true fires the initial page_view automatically.
+  window.gtag('config', GA_ID, { send_page_view: true });
 
   ready = true;
 }
@@ -41,7 +44,7 @@ export function track(event: string, params?: Record<string, unknown>) {
   window.gtag('event', event, params ?? {});
 }
 
-/** Track a (virtual) page view for an SPA state. */
+/** Track a virtual page view for an SPA state change (not the initial load). */
 export function trackPageView(path: string, title: string) {
   if (!GA_ID || !window.gtag) return;
   window.gtag('event', 'page_view', {
