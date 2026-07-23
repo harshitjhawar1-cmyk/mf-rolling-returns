@@ -26,8 +26,14 @@ const slugify   = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|
 const cleanName = n => n.split(' - ')[0].replace(/\s+(Direct|Regular)\s+.*/i, '').trim() || n;
 const esc       = s => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-// Only prerender growth plans — the schemes people actually search for.
-const growth = funds.filter(f => /growth/i.test(f.n) && !/idcw|dividend|payout|bonus/i.test(f.n));
+// Prerender Direct Growth plans — the highest-search-value subset, and small
+// enough to stay within hosting file-count limits. Every other fund still works
+// via client-side routing (SPA fallback); it just isn't statically prerendered.
+const growth = funds.filter(f =>
+  /growth/i.test(f.n) &&
+  /direct/i.test(f.n) &&
+  !/idcw|dividend|payout|bonus/i.test(f.n)
+);
 
 const urls = ['/'];
 
