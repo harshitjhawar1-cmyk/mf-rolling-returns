@@ -257,8 +257,8 @@ export default function App() {
           </div>
 
           <h1 className="display anim-2" style={{ fontSize:'clamp(2.4rem,6vw,4.2rem)', fontWeight:800, lineHeight:1.08, letterSpacing:'-.04em', marginBottom:20 }}>
-            Rolling returns give you<br/>
-            <span style={{ background:'linear-gradient(90deg,var(--indigo-lt),var(--cyan))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>the real picture</span>
+            The methods used by<br/>
+            <span style={{ background:'linear-gradient(90deg,var(--indigo-lt),var(--cyan))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>Expert Investors</span>
           </h1>
 
           <p className="anim-3" style={{ fontSize:'clamp(1rem,2vw,1.15rem)', color:'var(--txt2)', lineHeight:1.75, fontWeight:300, marginBottom:44, maxWidth:580, margin:'0 auto 44px' }}>
