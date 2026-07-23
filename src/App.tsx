@@ -236,15 +236,7 @@ export default function App() {
       {/* NAV */}
       <header style={{ position:'sticky', top:0, zIndex:50, backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', background:'rgba(8,12,20,.85)', borderBottom:'1px solid var(--border)', padding:'0 32px', height:56, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
         <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-          <div style={{ width:28, height:28, borderRadius:8, background:'linear-gradient(135deg,var(--indigo),var(--cyan))', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <g stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M7 18 V14.5"/><path d="M12 18 V11.5"/><path d="M17 18 V9"/>
-                <path d="M5 14 Q 11 6.5 18 6.5"/>
-              </g>
-              <circle cx="18" cy="6.5" r="1.5" fill="white"/>
-            </svg>
-          </div>
+          <img src="/logo-mark.png" alt="Rolling Return Calculator" width={30} height={30} style={{ borderRadius:8, display:'block' }} />
           <span className="display" style={{ fontWeight:700, fontSize:14, letterSpacing:'-.01em' }}>Rolling Return Calculator</span>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:20 }}>
