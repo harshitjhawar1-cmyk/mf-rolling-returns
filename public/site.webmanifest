@@ -1,0 +1,12 @@
+{
+  "name": "Rolling Returns Calculator",
+  "short_name": "Rolling Returns",
+  "description": "Rolling returns calculator for Indian mutual funds",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080c14",
+  "theme_color": "#080c14",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

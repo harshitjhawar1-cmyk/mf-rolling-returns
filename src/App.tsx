@@ -1,11 +1,40 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, lazy, Suspense } from 'react';
 import { SearchBox, FundEntry } from './components/SearchBox';
-import { RollingChart } from './components/RollingChart';
 import { StatsPanel } from './components/StatsPanel';
+
+// Lazy-load the chart (recharts) so the landing page — what search engines
+// index and most visitors see first — doesn't pay for it up front.
+const RollingChart = lazy(() => import('./components/RollingChart').then(m => ({ default: m.RollingChart })));
 import { RollingTable } from './components/RollingTable';
 import { fetchNAVHistory, FundMeta, NAVPoint } from './utils/mfApi';
 import { computeRolling, computeStats, RollingPoint } from './utils/rollingReturns';
 import { track, trackPageView } from './utils/analytics';
+import { fundUrl, codeFromPath, nameFromPath } from './utils/slug';
+
+const INITIAL_PATH = typeof location !== 'undefined' ? location.pathname : '/';
+const SITE = 'https://mf-rolling-returns.vercel.app';
+const DEFAULT_TITLE = 'Rolling Returns Calculator — Mutual Funds India | Free Tool';
+const DEFAULT_DESC  = 'Free rolling returns calculator for 14,000+ Indian mutual funds. See CAGR across every possible entry date — the honest way to judge a fund’s consistency.';
+
+function setMetaTags(title: string, description: string, canonical: string) {
+  if (typeof document === 'undefined') return;
+  document.title = title;
+  const set = (sel: string, attr: string, val: string) => {
+    const el = document.querySelector(sel);
+    if (el) el.setAttribute(attr, val);
+  };
+  set('meta[name="description"]', 'content', description);
+  set('meta[property="og:title"]', 'content', title);
+  set('meta[property="og:description"]', 'content', description);
+  set('meta[property="og:url"]', 'content', canonical);
+  set('meta[name="twitter:title"]', 'content', title);
+  set('meta[name="twitter:description"]', 'content', description);
+  set('link[rel="canonical"]', 'href', canonical);
+}
+
+function cleanFundName(n: string): string {
+  return n.split(' - ')[0].replace(/\s+(Direct|Regular)\s+.*/i, '').trim() || n;
+}
 
 interface WindowDef { years: number; label: string; key: string; defaultActive?: boolean }
 const WINDOWS: WindowDef[] = [
@@ -40,6 +69,7 @@ export default function App() {
   // In compare mode, lock to one window
   const [compareWindow, setCompareWindow] = useState<string>('w3y');
   const [mounted, setMounted]     = useState(false);
+  const [booted, setBooted]       = useState(false);
   const resultsRef                = useRef<HTMLDivElement>(null);
 
   useEffect(() => { requestAnimationFrame(() => setMounted(true)); }, []);
@@ -73,7 +103,8 @@ export default function App() {
     try {
       const { meta, nav } = await fetchNAVHistory(entry.c);
       const series = WINDOWS.map(w => ({ key: w.key, label: w.label, points: computeRolling(nav, w.years) }));
-      setFunds(prev => prev.map(f => f.fund.c === entry.c ? { ...f, meta, nav, series, loading: false } : f));
+      // Adopt the authoritative scheme name from the API (fixes URL-loaded placeholder names)
+      setFunds(prev => prev.map(f => f.fund.c === entry.c ? { ...f, meta, nav, series, loading: false, fund: { ...f.fund, n: meta.schemeName } } : f));
       track('fund_loaded', {
         scheme_code: entry.c,
         scheme_name: entry.n,
@@ -86,6 +117,41 @@ export default function App() {
       track('fund_load_failed', { scheme_code: entry.c, scheme_name: entry.n });
     }
   }, [funds]);
+
+  // On first load: if the URL is /fund/<slug>-<code>, auto-load that fund.
+  useEffect(() => {
+    const code = codeFromPath(INITIAL_PATH);
+    if (code) addFund({ c: code, n: nameFromPath(INITIAL_PATH) });
+    setBooted(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep the URL, document title and meta tags in sync with the current funds.
+  useEffect(() => {
+    if (!booted) return;
+    if (funds.length === 0) {
+      history.replaceState(null, '', '/');
+      setMetaTags(DEFAULT_TITLE, DEFAULT_DESC, SITE + '/');
+    } else if (funds.length === 1) {
+      const f = funds[0];
+      const url = fundUrl(f.fund);
+      history.replaceState(null, '', url);
+      const name = f.meta?.schemeName ?? f.fund.n;
+      setMetaTags(
+        `${cleanFundName(name)} — Rolling Returns & CAGR Analysis`,
+        `Rolling returns for ${name}. See annualised CAGR across every historical entry date — 1Y, 3Y, 5Y, 7Y, 10Y windows with best, worst, median and consistency metrics. Live NAV data.`,
+        SITE + url,
+      );
+    } else {
+      history.replaceState(null, '', '/compare');
+      const names = funds.map(f => cleanFundName(f.meta?.schemeName ?? f.fund.n)).join(' vs ');
+      setMetaTags(
+        `Compare Rolling Returns — ${names}`,
+        `Side-by-side rolling returns comparison of ${funds.length} mutual funds across 1M–10Y windows. See which fund is more consistent.`,
+        SITE + '/compare',
+      );
+    }
+  }, [funds, booted]);
 
   function removeFund(code: number) {
     const removed = funds.find(f => f.fund.c === code);
@@ -303,11 +369,13 @@ export default function App() {
               <p className="mono" style={{ fontSize:11, color:'var(--txt3)', marginBottom:16 }}>
                 X-axis = exit date · 1M/3M/6M = absolute return · 1Y+ = annualised CAGR
               </p>
-              <RollingChart
-                funds={funds}
-                activeKeys={chartActiveKeys}
-                isCompare={isCompare}
-              />
+              <Suspense fallback={<div style={{ height:380, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--txt3)', fontFamily:'Fira Code, monospace', fontSize:12 }}>Loading chart…</div>}>
+                <RollingChart
+                  funds={funds}
+                  activeKeys={chartActiveKeys}
+                  isCompare={isCompare}
+                />
+              </Suspense>
             </div>
 
             {/* Stats — single fund, single window only */}

@@ -3,10 +3,110 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MF Rolling Returns</title>
+
+    <!-- Primary Meta -->
+    <title>Rolling Returns Calculator — Mutual Funds India | Free Tool</title>
+    <meta name="description" content="Free rolling returns calculator for 14,000+ Indian mutual funds. See CAGR across every possible entry date — the honest way to judge a fund's consistency. Compare funds side by side. Live NAV data." />
+    <meta name="keywords" content="rolling returns, mutual fund rolling returns, rolling returns calculator india, mutual fund consistency, CAGR calculator, mutual fund comparison, point to point returns, SIP returns" />
+    <meta name="author" content="Rolling Returns" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://mf-rolling-returns.vercel.app/" />
+    <meta name="theme-color" content="#080c14" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Rolling Returns" />
+    <meta property="og:title" content="Rolling Returns Calculator — Mutual Funds India" />
+    <meta property="og:description" content="See how any Indian mutual fund performed across every possible entry date. Rolling returns reveal consistency that point-to-point returns hide. Free, 14,000+ funds, live NAV." />
+    <meta property="og:url" content="https://mf-rolling-returns.vercel.app/" />
+    <meta property="og:image" content="https://mf-rolling-returns.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Rolling Returns Calculator — Mutual Funds India" />
+    <meta name="twitter:description" content="See how any Indian mutual fund performed across every possible entry date. Free tool, 14,000+ funds, live NAV." />
+    <meta name="twitter:image" content="https://mf-rolling-returns.vercel.app/og-image.png" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Preconnect to data sources -->
+    <link rel="preconnect" href="https://api.mfapi.in" />
+
+    <!-- Structured Data: WebApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Rolling Returns Calculator",
+      "url": "https://mf-rolling-returns.vercel.app/",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+      "description": "Free rolling returns calculator for Indian mutual funds. Analyse CAGR across every historical entry date and compare funds by consistency.",
+      "featureList": [
+        "Rolling returns for 14,000+ mutual funds",
+        "1M to 10Y rolling windows",
+        "Compare up to 6 funds side by side",
+        "Best, worst, median, average and consistency metrics",
+        "Live NAV data from AMFI"
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: FAQ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What are rolling returns?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Rolling returns measure a fund's return for every possible entry date across its history, instead of a single start-to-end period. This reveals how consistent a fund really is, because it shows the best case, worst case and typical outcome no matter when you invested."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why are point-to-point returns misleading?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Point-to-point returns depend entirely on the start and end dates chosen. A fund can look excellent over one 5-year window and poor over another that starts a year later. Rolling returns remove this cherry-picking by averaging across all entry dates."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this rolling returns calculator free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The tool is completely free, requires no sign-up, and covers over 14,000 AMFI-registered Indian mutual funds using live NAV data."
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body class="bg-gray-950 text-gray-100 antialiased">
     <div id="root"></div>
+
+    <!-- Static content for crawlers before JS renders -->
+    <noscript>
+      <h1>Rolling Returns Calculator for Indian Mutual Funds</h1>
+      <p>
+        Analyse rolling returns for 14,000+ Indian mutual funds. Rolling returns show a fund's
+        annualised CAGR across every possible entry date in its history — the honest way to judge
+        consistency, unlike point-to-point returns which can be cherry-picked. Compare up to six
+        funds side by side across 1-month to 10-year windows, with best, worst, median, average
+        and consistency metrics. Free, no sign-up, live NAV data from AMFI.
+      </p>
+    </noscript>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
