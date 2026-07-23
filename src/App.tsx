@@ -253,7 +253,7 @@ export default function App() {
         <div style={{ maxWidth:720, margin:'0 auto', textAlign:'center', position:'relative' }}>
           <div className="anim-1" style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(99,102,241,.12)', border:'1px solid rgba(99,102,241,.3)', borderRadius:999, padding:'5px 14px', marginBottom:28 }}>
             <span style={{ width:6, height:6, borderRadius:'50%', background:'var(--indigo-lt)', animation:'pulse-glow 2s ease infinite' }} />
-            <span className="mono" style={{ fontSize:11, color:'var(--indigo-lt)', letterSpacing:'.06em' }}>Use the tools investment professionals use</span>
+            <span className="mono" style={{ fontSize:11, color:'var(--indigo-lt)', letterSpacing:'.06em' }}>Analyse funds with more consistency</span>
           </div>
 
           <h1 className="display anim-2" style={{ fontSize:'clamp(2.4rem,6vw,4.2rem)', fontWeight:800, lineHeight:1.08, letterSpacing:'-.04em', marginBottom:20 }}>
