@@ -10,6 +10,7 @@ import { fetchNAVHistory, FundMeta, NAVPoint } from './utils/mfApi';
 import { computeRolling, computeStats, RollingPoint } from './utils/rollingReturns';
 import { track, trackPageView } from './utils/analytics';
 import { fundUrl, codeFromPath, nameFromPath } from './utils/slug';
+import { Footer } from './components/Footer';
 
 const INITIAL_PATH = typeof location !== 'undefined' ? location.pathname : '/';
 const SITE = 'https://mf-rolling-returns.vercel.app';
@@ -503,11 +504,7 @@ export default function App() {
         </section>
       )}
 
-      <footer style={{ borderTop:'1px solid var(--border)', padding:'20px 24px', textAlign:'center' }}>
-        <p className="mono" style={{ fontSize:11, color:'var(--txt3)' }}>
-          Rolling Returns · Fund index from AMFI · NAV data from mfapi.in · Rebuilt weekly via GitHub Actions
-        </p>
-      </footer>
+      <Footer />
     </>
   );
 }
