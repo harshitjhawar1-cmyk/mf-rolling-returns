@@ -11,6 +11,7 @@ import { computeRolling, computeStats, RollingPoint } from './utils/rollingRetur
 import { track, trackPageView } from './utils/analytics';
 import { fundUrl, codeFromPath, nameFromPath } from './utils/slug';
 import { Footer } from './components/Footer';
+import { FeedbackWidget } from './components/FeedbackWidget';
 
 const INITIAL_PATH = typeof location !== 'undefined' ? location.pathname : '/';
 const SITE = 'https://mf-rolling-returns.vercel.app';
@@ -236,9 +237,15 @@ export default function App() {
       <header style={{ position:'sticky', top:0, zIndex:50, backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', background:'rgba(8,12,20,.85)', borderBottom:'1px solid var(--border)', padding:'0 32px', height:56, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
         <div style={{ display:'flex', alignItems:'center', gap:10 }}>
           <div style={{ width:28, height:28, borderRadius:8, background:'linear-gradient(135deg,var(--indigo),var(--cyan))', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <g stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M7 18 V14.5"/><path d="M12 18 V11.5"/><path d="M17 18 V9"/>
+                <path d="M5 14 Q 11 6.5 18 6.5"/>
+              </g>
+              <circle cx="18" cy="6.5" r="1.5" fill="white"/>
+            </svg>
           </div>
-          <span className="display" style={{ fontWeight:700, fontSize:14, letterSpacing:'-.01em' }}>Rolling Returns</span>
+          <span className="display" style={{ fontWeight:700, fontSize:14, letterSpacing:'-.01em' }}>Rolling Return Calculator</span>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:20 }}>
           <span className="mono" style={{ fontSize:11, color:'var(--txt3)' }}>14k+ funds · live NAV</span>
@@ -254,16 +261,16 @@ export default function App() {
         <div style={{ maxWidth:720, margin:'0 auto', textAlign:'center', position:'relative' }}>
           <div className="anim-1" style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(99,102,241,.12)', border:'1px solid rgba(99,102,241,.3)', borderRadius:999, padding:'5px 14px', marginBottom:28 }}>
             <span style={{ width:6, height:6, borderRadius:'50%', background:'var(--indigo-lt)', animation:'pulse-glow 2s ease infinite' }} />
-            <span className="mono" style={{ fontSize:11, color:'var(--indigo-lt)', letterSpacing:'.06em' }}>honest fund evaluation</span>
+            <span className="mono" style={{ fontSize:11, color:'var(--indigo-lt)', letterSpacing:'.06em' }}>Use the tools investment professionals use</span>
           </div>
 
           <h1 className="display anim-2" style={{ fontSize:'clamp(2.4rem,6vw,4.2rem)', fontWeight:800, lineHeight:1.08, letterSpacing:'-.04em', marginBottom:20 }}>
-            Stop trusting<br/>
-            <span style={{ background:'linear-gradient(90deg,var(--indigo-lt),var(--cyan))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>point-to-point returns</span>
+            Rolling returns give you<br/>
+            <span style={{ background:'linear-gradient(90deg,var(--indigo-lt),var(--cyan))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>the real picture</span>
           </h1>
 
-          <p className="anim-3" style={{ fontSize:'clamp(1rem,2vw,1.15rem)', color:'var(--txt2)', lineHeight:1.75, fontWeight:300, marginBottom:44, maxWidth:560, margin:'0 auto 44px' }}>
-            Any fund can look great with the right start date. Rolling returns show the <strong style={{ color:'var(--txt)', fontWeight:600 }}>real distribution</strong> — every possible entry point. Compare up to {MAX_FUNDS} funds side by side.
+          <p className="anim-3" style={{ fontSize:'clamp(1rem,2vw,1.15rem)', color:'var(--txt2)', lineHeight:1.75, fontWeight:300, marginBottom:44, maxWidth:580, margin:'0 auto 44px' }}>
+            A fund's advertised return is just one lucky window. Rolling returns test it against <strong style={{ color:'var(--txt)', fontWeight:600 }}>every possible entry date</strong> — so you can see how <strong style={{ color:'var(--txt)', fontWeight:600 }}>consistent</strong> it really is. Consistency, not a well-timed start date, is what actually compounds your wealth. Compare up to {MAX_FUNDS} funds side by side.
           </p>
 
           {/* SEARCH */}
@@ -464,13 +471,16 @@ export default function App() {
         <section style={{ maxWidth:1100, margin:'0 auto', padding:'20px 24px 100px' }}>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))', gap:16, marginBottom:72 }}>
             {[
-              { icon:'📊', color:'var(--red)',   title:'"Top performing fund" means nothing', body:'Every fund can claim top performance — just pick the right 3-year window. The same fund might have returned -6% if you started a year earlier.' },
-              { icon:'📅', color:'var(--amber)',  title:'Timing risk is real and hidden', body:'Two investors in the same fund with a 2-year gap can have wildly different outcomes. Point-to-point returns hide this completely.' },
-              { icon:'📈', color:'var(--green)',  title:'Rolling returns show the full picture', body:'Every dot on the chart is a different entry date. You see best case, worst case, and median — all at once, no cherry-picking.' },
+              { icon:'🎯', color:'var(--red)',   tag:'The problem', title:'The returns you see are cherry-picked', body:'Fund ads show returns for one flattering period. Move the start date by a year and a “great” fund can suddenly look ordinary — or worse.' },
+              { icon:'👥', color:'var(--amber)',  tag:'Why it matters', title:'Same fund, very different results', body:'Two people who bought the same fund a year apart can end up with wildly different returns. One “past performance” number completely hides this timing luck.' },
+              { icon:'✅', color:'var(--green)',  tag:'The fix', title:'Judge a fund on consistency', body:'Rolling returns test the fund on every possible start date at once. You instantly see the best case, the worst case, and what usually happened — no cherry-picking.' },
             ].map((f, i) => (
               <div key={i} className="feat-card">
-                <div style={{ fontSize:24, marginBottom:18 }}>{f.icon}</div>
-                <h3 className="display" style={{ fontSize:15, fontWeight:700, marginBottom:10, lineHeight:1.4, letterSpacing:'-.01em' }}>{f.title}</h3>
+                <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16 }}>
+                  <div style={{ width:44, height:44, borderRadius:12, background:`color-mix(in srgb, ${f.color} 14%, transparent)`, border:`1px solid color-mix(in srgb, ${f.color} 30%, transparent)`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:22 }}>{f.icon}</div>
+                  <span className="mono" style={{ fontSize:10, letterSpacing:'.08em', textTransform:'uppercase', color:f.color, fontWeight:600 }}>{f.tag}</span>
+                </div>
+                <h3 className="display" style={{ fontSize:16, fontWeight:700, marginBottom:10, lineHeight:1.35, letterSpacing:'-.01em' }}>{f.title}</h3>
                 <p style={{ fontSize:13.5, color:'var(--txt2)', lineHeight:1.75 }}>{f.body}</p>
               </div>
             ))}
@@ -504,6 +514,7 @@ export default function App() {
         </section>
       )}
 
+      <FeedbackWidget />
       <Footer />
     </>
   );

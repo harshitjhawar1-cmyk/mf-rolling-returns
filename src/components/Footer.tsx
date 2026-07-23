@@ -75,9 +75,15 @@ export function Footer() {
         <div style={{ marginTop: 40, paddingTop: 20, borderTop: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 22, height: 22, borderRadius: 6, background: 'linear-gradient(135deg,var(--indigo),var(--cyan))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <g stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 18 V14.5"/><path d="M12 18 V11.5"/><path d="M17 18 V9"/>
+                  <path d="M5 14 Q 11 6.5 18 6.5"/>
+                </g>
+                <circle cx="18" cy="6.5" r="1.5" fill="white"/>
+              </svg>
             </div>
-            <span className="display" style={{ fontSize: 13, fontWeight: 700 }}>Rolling Returns</span>
+            <span className="display" style={{ fontSize: 13, fontWeight: 700 }}>Rolling Return Calculator</span>
           </div>
           <span className="mono" style={{ fontSize: 11, color: 'var(--txt3)' }}>
             Free · No signup · Fund index rebuilt weekly via GitHub Actions
