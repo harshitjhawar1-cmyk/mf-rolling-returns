@@ -12,6 +12,7 @@ import { track, trackPageView } from './utils/analytics';
 import { fundUrl, codeFromPath, nameFromPath } from './utils/slug';
 import { Footer } from './components/Footer';
 import { FeedbackWidget } from './components/FeedbackWidget';
+import { ExplainerCards } from './components/ExplainerCards';
 
 const INITIAL_PATH = typeof location !== 'undefined' ? location.pathname : '/';
 const SITE = 'https://mf-rolling-returns.vercel.app';
@@ -261,8 +262,8 @@ export default function App() {
             <span style={{ background:'linear-gradient(90deg,var(--indigo-lt),var(--cyan))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>Expert Investors</span>
           </h1>
 
-          <p className="anim-3" style={{ fontSize:'clamp(1rem,2vw,1.15rem)', color:'var(--txt2)', lineHeight:1.75, fontWeight:300, marginBottom:44, maxWidth:580, margin:'0 auto 44px' }}>
-            A fund's advertised return is just one lucky window. Rolling returns test it against <strong style={{ color:'var(--txt)', fontWeight:600 }}>every possible entry date</strong> — so you can see how <strong style={{ color:'var(--txt)', fontWeight:600 }}>consistent</strong> it really is. Consistency, not a well-timed start date, is what actually compounds your wealth. Compare up to {MAX_FUNDS} funds side by side.
+          <p className="anim-3" style={{ fontSize:'clamp(1.05rem,2vw,1.2rem)', color:'var(--txt2)', lineHeight:1.7, fontWeight:300, marginBottom:44, maxWidth:540, margin:'0 auto 44px' }}>
+            See how <strong style={{ color:'var(--txt)', fontWeight:600 }}>consistent</strong> a fund really is — tested across <strong style={{ color:'var(--txt)', fontWeight:600 }}>every entry date</strong>, not one lucky window. Compare up to {MAX_FUNDS} side by side.
           </p>
 
           {/* SEARCH */}
@@ -461,22 +462,7 @@ export default function App() {
       {/* LANDING (when no funds) */}
       {funds.length === 0 && (
         <section style={{ maxWidth:1100, margin:'0 auto', padding:'20px 24px 100px' }}>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))', gap:16, marginBottom:72 }}>
-            {[
-              { icon:'🎯', color:'var(--red)',   tag:'The problem', title:'The returns you see are cherry-picked', body:'Fund ads show returns for one flattering period. Move the start date by a year and a “great” fund can suddenly look ordinary — or worse.' },
-              { icon:'👥', color:'var(--amber)',  tag:'Why it matters', title:'Same fund, very different results', body:'Two people who bought the same fund a year apart can end up with wildly different returns. One “past performance” number completely hides this timing luck.' },
-              { icon:'✅', color:'var(--green)',  tag:'The fix', title:'Judge a fund on consistency', body:'Rolling returns test the fund on every possible start date at once. You instantly see the best case, the worst case, and what usually happened — no cherry-picking.' },
-            ].map((f, i) => (
-              <div key={i} className="feat-card">
-                <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16 }}>
-                  <div style={{ width:44, height:44, borderRadius:12, background:`color-mix(in srgb, ${f.color} 14%, transparent)`, border:`1px solid color-mix(in srgb, ${f.color} 30%, transparent)`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:22 }}>{f.icon}</div>
-                  <span className="mono" style={{ fontSize:10, letterSpacing:'.08em', textTransform:'uppercase', color:f.color, fontWeight:600 }}>{f.tag}</span>
-                </div>
-                <h3 className="display" style={{ fontSize:16, fontWeight:700, marginBottom:10, lineHeight:1.35, letterSpacing:'-.01em' }}>{f.title}</h3>
-                <p style={{ fontSize:13.5, color:'var(--txt2)', lineHeight:1.75 }}>{f.body}</p>
-              </div>
-            ))}
-          </div>
+          <ExplainerCards />
           <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:20, padding:'48px 40px', position:'relative', overflow:'hidden' }}>
             <div style={{ position:'absolute', top:-60, right:-60, width:240, height:240, background:'radial-gradient(circle,rgba(99,102,241,.12),transparent 70%)', pointerEvents:'none' }} />
             <h2 className="display" style={{ fontSize:'clamp(1.2rem,2.5vw,1.7rem)', fontWeight:800, letterSpacing:'-.03em', marginBottom:40 }}>How it works</h2>
