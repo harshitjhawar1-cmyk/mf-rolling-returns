@@ -206,6 +206,7 @@ export default function App() {
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
         html { scroll-behavior:smooth; }
         body { background:var(--bg); color:var(--txt); font-family:'Plus Jakarta Sans',sans-serif; -webkit-font-smoothing:antialiased; }
+        html, body, #root { overflow-x:clip; max-width:100vw; }
         .display { font-family:'Bricolage Grotesque',sans-serif; }
         .mono    { font-family:'Fira Code',monospace; }
         @keyframes fadeUp  { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
@@ -232,16 +233,22 @@ export default function App() {
           border:1px solid; font-size:12px; font-weight:500;
           transition:all .15s;
         }
+        @media (max-width: 620px) { .nav-meta { display:none; } }
       `}</style>
 
       {/* NAV */}
-      <header style={{ position:'sticky', top:0, zIndex:50, backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', background:'rgba(8,12,20,.85)', borderBottom:'1px solid var(--border)', padding:'0 32px', height:56, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-          <img src="/logo-mark.png" alt="Rolling Return Calculator" width={30} height={30} style={{ borderRadius:8, display:'block' }} />
-          <span className="display" style={{ fontWeight:700, fontSize:14, letterSpacing:'-.01em' }}>Rolling Return Calculator</span>
-        </div>
-        <div style={{ display:'flex', alignItems:'center', gap:20 }}>
-          <span className="mono" style={{ fontSize:11, color:'var(--txt3)' }}>14k+ funds · live NAV</span>
+      <header style={{ position:'sticky', top:0, zIndex:50, backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', background:'rgba(8,12,20,.85)', borderBottom:'1px solid var(--border)', padding:'0 20px', height:56, display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
+        <a
+          href="/"
+          onClick={e => { e.preventDefault(); if (funds.length) setFunds([]); globalThis.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          style={{ display:'flex', alignItems:'center', gap:10, textDecoration:'none', color:'inherit', minWidth:0 }}
+          aria-label="Go to homepage"
+        >
+          <img src="/logo-mark.png" alt="Rolling Return Calculator" width={30} height={30} style={{ borderRadius:8, display:'block', flexShrink:0 }} />
+          <span className="display" style={{ fontWeight:700, fontSize:14, letterSpacing:'-.01em', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>Rolling Return Calculator</span>
+        </a>
+        <div style={{ display:'flex', alignItems:'center', gap:16, flexShrink:0 }}>
+          <span className="mono nav-meta" style={{ fontSize:11, color:'var(--txt3)', whiteSpace:'nowrap' }}>14k+ funds · live NAV</span>
           <span style={{ fontSize:11, padding:'3px 10px', borderRadius:999, background:'rgba(99,102,241,.15)', color:'var(--indigo-lt)', border:'1px solid rgba(99,102,241,.3)', fontWeight:600 }}>Free</span>
         </div>
       </header>
@@ -257,8 +264,8 @@ export default function App() {
             <span className="mono" style={{ fontSize:11, color:'var(--indigo-lt)', letterSpacing:'.06em' }}>Analyse funds with more consistency</span>
           </div>
 
-          <h1 className="display anim-2" style={{ fontSize:'clamp(2.4rem,6vw,4.2rem)', fontWeight:800, lineHeight:1.08, letterSpacing:'-.04em', marginBottom:20 }}>
-            The methods used by<br/>
+          <h1 className="display anim-2" style={{ fontSize:'clamp(2rem,4.6vw,3.3rem)', fontWeight:800, lineHeight:1.1, letterSpacing:'-.03em', marginBottom:20 }}>
+            Access the methods used by<br/>
             <span style={{ background:'linear-gradient(90deg,var(--indigo-lt),var(--cyan))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>Expert Investors</span>
           </h1>
 
