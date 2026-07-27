@@ -47,7 +47,7 @@ const WINDOWS: WindowDef[] = [
   { years: 6/12, label: '6M',  key: 'w6m' },
   { years: 1,    label: '1Y',  key: 'w1y' },
   { years: 3,    label: '3Y',  key: 'w3y', defaultActive: true },
-  { years: 5,    label: '5Y',  key: 'w5y', defaultActive: true },
+  { years: 5,    label: '5Y',  key: 'w5y' },
   { years: 7,    label: '7Y',  key: 'w7y' },
   { years: 10,   label: '10Y', key: 'w10y' },
 ];
@@ -175,7 +175,7 @@ export default function App() {
       return;
     }
     track('window_toggled', { window: label });
-    setActiveKeys(prev => prev.includes(key) ? (prev.length > 1 ? prev.filter(k => k !== key) : prev) : [...prev, key]);
+    setActiveKeys([key]); // single-select: one rolling window at a time
   }
 
   const activeSingleFund  = !isCompare && funds[0];
@@ -395,11 +395,6 @@ export default function App() {
                 </p>
                 <StatsPanel windowLabel={singleActiveWin.label} stats={singleActiveStats} />
               </div>
-            )}
-            {!isCompare && activeKeys.length > 1 && (
-              <p className="mono" style={{ textAlign:'center', fontSize:11, color:'var(--txt3)', paddingBottom:28 }}>
-                Select a single window to see statistics
-              </p>
             )}
 
             {/* Compare stats table */}
