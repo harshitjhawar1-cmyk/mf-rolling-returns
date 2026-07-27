@@ -14,6 +14,7 @@ import { Footer } from './components/Footer';
 import { FeedbackWidget } from './components/FeedbackWidget';
 import { ExplainerCards } from './components/ExplainerCards';
 import { FundSEOContent } from './components/FundSEOContent';
+import { ShareButton } from './components/ShareButton';
 
 const INITIAL_PATH = typeof location !== 'undefined' ? location.pathname : '/';
 const SITE = 'https://mf-rolling-returns.vercel.app';
@@ -198,6 +199,14 @@ export default function App() {
   // Which keys are currently active on the chart
   const chartActiveKeys = isCompare ? [compareWindow] : activeKeys;
 
+  // Share text for the current view
+  const shareTitle = isCompare
+    ? 'Compare Mutual Fund Rolling Returns'
+    : funds[0] ? `${cleanFundName(funds[0].meta?.schemeName ?? funds[0].fund.n)} — Rolling Returns` : 'Rolling Returns';
+  const shareText = isCompare
+    ? `Comparing rolling returns of ${funds.map(f => cleanFundName(f.meta?.schemeName ?? f.fund.n)).join(' vs ')} — which fund is more consistent?`
+    : funds[0] ? `${cleanFundName(funds[0].meta?.schemeName ?? funds[0].fund.n)} rolling returns — see how consistent this fund really is across every entry date.` : '';
+
   return (
     <>
       <style>{`
@@ -365,17 +374,20 @@ export default function App() {
               })}
               {isCompare && <span className="mono" style={{ fontSize:11, color:'var(--txt3)', marginLeft:4, opacity:.6 }}>one window at a time in compare mode</span>}
 
-              {/* Add fund shortcut inside chart */}
-              {funds.length < MAX_FUNDS && (
-                <button
-                  style={{ marginLeft:'auto', display:'inline-flex', alignItems:'center', gap:6, padding:'6px 14px', borderRadius:8, border:'1px dashed rgba(99,102,241,.4)', background:'rgba(99,102,241,.08)', color:'var(--indigo-lt)', fontSize:12, fontWeight:500, cursor:'pointer', transition:'all .15s' }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor='var(--indigo)'; e.currentTarget.style.background='rgba(99,102,241,.15)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor='rgba(99,102,241,.4)'; e.currentTarget.style.background='rgba(99,102,241,.08)'; }}
-                  onClick={() => { track('add_fund_cta_clicked', { current_funds: funds.length }); globalThis.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                >
-                  <span style={{ fontSize:16 }}>+</span> Add fund to compare
-                </button>
-              )}
+              {/* Right-aligned actions: share + add-fund */}
+              <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:8 }}>
+                <ShareButton title={shareTitle} text={shareText} />
+                {funds.length < MAX_FUNDS && (
+                  <button
+                    style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'6px 14px', borderRadius:8, border:'1px dashed rgba(99,102,241,.4)', background:'rgba(99,102,241,.08)', color:'var(--indigo-lt)', fontSize:12, fontWeight:500, cursor:'pointer', transition:'all .15s', whiteSpace:'nowrap' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor='var(--indigo)'; e.currentTarget.style.background='rgba(99,102,241,.15)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor='rgba(99,102,241,.4)'; e.currentTarget.style.background='rgba(99,102,241,.08)'; }}
+                    onClick={() => { track('add_fund_cta_clicked', { current_funds: funds.length }); globalThis.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  >
+                    <span style={{ fontSize:16 }}>+</span> Add fund to compare
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Chart */}
