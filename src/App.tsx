@@ -13,6 +13,7 @@ import { fundUrl, codeFromPath, nameFromPath } from './utils/slug';
 import { Footer } from './components/Footer';
 import { FeedbackWidget } from './components/FeedbackWidget';
 import { ExplainerCards } from './components/ExplainerCards';
+import { FundSEOContent } from './components/FundSEOContent';
 
 const INITIAL_PATH = typeof location !== 'undefined' ? location.pathname : '/';
 const SITE = 'https://mf-rolling-returns.vercel.app';
@@ -464,6 +465,15 @@ export default function App() {
             </div>
           </div>
         </section>
+      )}
+
+      {/* PER-FUND SEO CONTENT (single fund only) */}
+      {hasAnyResult && !isCompare && funds[0] && funds[0].meta && (
+        <FundSEOContent
+          fundName={funds[0].meta?.schemeName ?? funds[0].fund.n}
+          apiCategory={funds[0].meta?.schemeCategory}
+          apiFundHouse={funds[0].meta?.fundHouse}
+        />
       )}
 
       {/* LANDING (when no funds) */}
