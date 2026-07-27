@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { track } from '../utils/analytics';
 
-const ENDPOINT = import.meta.env.VITE_FEEDBACK_ENDPOINT as string | undefined;
+// The webhook URL is called from the browser, so it's public by nature —
+// keeping it in code (env var overridable) is fine and avoids build-time config.
+const ENDPOINT =
+  (import.meta.env.VITE_FEEDBACK_ENDPOINT as string | undefined) ||
+  'https://script.google.com/macros/s/AKfycbwQbPco-tcJP5H9_UeSOQppQuPrXt5-TjQUhRDI547Xi9SSAs-hZmPc5LRlhJDrZwk0/exec';
 
 type State = 'idle' | 'sending' | 'done' | 'error';
 
