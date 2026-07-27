@@ -75,6 +75,12 @@ export default function App() {
   const [mounted, setMounted]     = useState(false);
   const [booted, setBooted]       = useState(false);
   const resultsRef                = useRef<HTMLDivElement>(null);
+  // Tracks which "page" GA last recorded, so SPA navigations fire exactly one
+  // page_view each (the initial load is already auto-tracked by gtag config).
+  const lastViewKey = useRef<string>(
+    codeFromPath(INITIAL_PATH) ? `fund:${codeFromPath(INITIAL_PATH)}`
+      : INITIAL_PATH.startsWith('/compare') ? 'compare' : 'home'
+  );
 
   useEffect(() => { requestAnimationFrame(() => setMounted(true)); }, []);
 
@@ -91,12 +97,8 @@ export default function App() {
       fund_position: position,
       is_comparison: position > 1,
     });
-    if (position === 2) {
-      track('compare_mode_entered', { fund_count: 2 });
-      trackPageView('/compare', 'MF Rolling Returns — Compare');
-    } else if (position === 1) {
-      trackPageView('/fund', 'MF Rolling Returns — Fund Detail');
-    }
+    if (position === 2) track('compare_mode_entered', { fund_count: 2 });
+    // Page views are fired from the URL-sync effect using the real path (see below).
 
     const color = FUND_COLORS[funds.length % FUND_COLORS.length];
     const placeholder: FundData = { fund: entry, meta: null, nav: [], series: [], color, loading: true, error: '' };
@@ -130,30 +132,33 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Keep the URL, document title and meta tags in sync with the current funds.
+  // Keep the URL, document title and meta tags in sync with the current funds,
+  // and fire a single GA page_view per genuine view change (real path).
   useEffect(() => {
     if (!booted) return;
+    let path: string, title: string, desc: string, key: string;
     if (funds.length === 0) {
-      history.replaceState(null, '', '/');
-      setMetaTags(DEFAULT_TITLE, DEFAULT_DESC, SITE + '/');
+      path = '/'; key = 'home';
+      title = DEFAULT_TITLE; desc = DEFAULT_DESC;
     } else if (funds.length === 1) {
       const f = funds[0];
-      const url = fundUrl(f.fund);
-      history.replaceState(null, '', url);
       const name = f.meta?.schemeName ?? f.fund.n;
-      setMetaTags(
-        `${cleanFundName(name)} — Rolling Returns & CAGR Analysis`,
-        `Rolling returns for ${name}. See annualised CAGR across every historical entry date — 1Y, 3Y, 5Y, 7Y, 10Y windows with best, worst, median and consistency metrics. Live NAV data.`,
-        SITE + url,
-      );
+      path = fundUrl(f.fund); key = `fund:${f.fund.c}`;
+      title = `${cleanFundName(name)} — Rolling Returns & CAGR Analysis`;
+      desc = `Rolling returns for ${name}. See annualised CAGR across every historical entry date — 1Y, 3Y, 5Y, 7Y, 10Y windows with best, worst, median and consistency metrics. Live NAV data.`;
     } else {
-      history.replaceState(null, '', '/compare');
+      path = '/compare'; key = 'compare';
       const names = funds.map(f => cleanFundName(f.meta?.schemeName ?? f.fund.n)).join(' vs ');
-      setMetaTags(
-        `Compare Rolling Returns — ${names}`,
-        `Side-by-side rolling returns comparison of ${funds.length} mutual funds across 1M–10Y windows. See which fund is more consistent.`,
-        SITE + '/compare',
-      );
+      title = `Compare Rolling Returns — ${names}`;
+      desc = `Side-by-side rolling returns comparison of ${funds.length} mutual funds across 1M–10Y windows. See which fund is more consistent.`;
+    }
+    history.replaceState(null, '', path);
+    setMetaTags(title, desc, SITE + path);
+    // Only count a page_view when the actual view changes (not on meta refreshes,
+    // and not for the initial load which gtag already auto-tracked).
+    if (key !== lastViewKey.current) {
+      lastViewKey.current = key;
+      trackPageView(path, title);
     }
   }, [funds, booted]);
 
