@@ -376,7 +376,19 @@ export default function App() {
 
               {/* Right-aligned actions: share + add-fund */}
               <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:8 }}>
-                <ShareButton title={shareTitle} text={shareText} />
+                <ShareButton
+                  title={shareTitle}
+                  text={shareText}
+                  image={!isCompare && activeSingleFund && activeSingleFund.meta && singleActiveWin && singleActiveStats ? {
+                    fundName: cleanFundName(activeSingleFund.meta.schemeName),
+                    category: activeSingleFund.meta.schemeCategory || '',
+                    house: activeSingleFund.meta.fundHouse || '',
+                    windowLabel: singleActiveWin.label,
+                    isAbsolute: singleActiveWin.years < 1,
+                    points: activeSingleFund.series.find(s => s.key === singleActiveWin.key)?.points ?? [],
+                    stats: singleActiveStats,
+                  } : undefined}
+                />
                 {funds.length < MAX_FUNDS && (
                   <button
                     style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'6px 14px', borderRadius:8, border:'1px dashed rgba(99,102,241,.4)', background:'rgba(99,102,241,.08)', color:'var(--indigo-lt)', fontSize:12, fontWeight:500, cursor:'pointer', transition:'all .15s', whiteSpace:'nowrap' }}

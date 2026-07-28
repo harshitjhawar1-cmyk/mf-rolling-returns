@@ -34,10 +34,13 @@ export async function fetchNAVHistory(schemeCode: number): Promise<{ meta: FundM
     schemeCategory: json.meta.scheme_category,
   };
 
-  // API returns newest-first; reverse to oldest-first
+  // API returns newest-first; reverse to oldest-first.
+  // Drop non-positive NAVs — mfapi.in occasionally has bad 0.0 entries that
+  // otherwise produce garbage rolling returns (e.g. a window ending on a 0
+  // NAV computes as -100%).
   const nav: NAVPoint[] = (json.data as { date: string; nav: string }[])
     .map(d => ({ date: parseDate(d.date), nav: parseFloat(d.nav) }))
-    .filter(d => !isNaN(d.date.getTime()) && !isNaN(d.nav))
+    .filter(d => !isNaN(d.date.getTime()) && !isNaN(d.nav) && d.nav > 0)
     .reverse();
 
   return { meta, nav };
