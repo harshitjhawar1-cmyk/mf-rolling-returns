@@ -54,6 +54,9 @@ export function SearchBox({ onSelect, addedCodes = [], placeholder }: SearchBoxP
         </svg>
         <input
           type="text"
+          /* smartlook-show: fund-name search isn't sensitive — record actual text
+             instead of Smartlook's default input masking */
+          className="smartlook-show"
           value={query}
           onChange={e => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
